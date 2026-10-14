@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>喋るモノのAIショート｜作り方マニュアル</title>
+<meta name="description" content="カイロやレモンが喋るAIショート動画の作り方。ChatGPT・画像生成AI・音声AI・動画AIを順番に使うだけで、手を動かすのは5分。プロンプトはコピーして使えます。">
+<style>
+  :root{
+    --ground:#faf7f0; --panel:#ffffff; --panel-2:#f3eee3;
+    --ink:#241f17; --muted:#7d7566; --line:#e7dfcf;
+    --gold:#c68a00; --gold-soft:#e9a900; --rose:#c14b7d;
+    --shadow:0 1px 2px rgba(40,30,10,.05),0 8px 30px rgba(40,30,10,.07);
+    --radius:16px;
+    --sans:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;
+    color-scheme:light;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground)}
+  .wrap{
+    font-family:var(--sans); color:var(--ink); background:var(--ground);
+    -webkit-font-smoothing:antialiased; line-height:1.7;
+    padding:clamp(20px,5vw,64px) clamp(16px,5vw,32px);
+  }
+  .page{max-width:960px;margin:0 auto}
+  .eyebrow{
+    font-size:12px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--gold); font-weight:800; margin:0 0 14px;
+  }
+  h1{
+    font-size:clamp(38px,7vw,64px); line-height:1.02; letter-spacing:-.02em;
+    margin:0 0 16px; font-weight:900; text-wrap:balance;
+  }
+  .lead{font-size:clamp(16px,2.4vw,20px); color:var(--muted); max-width:34em; margin:0}
+  .tag-mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+  /* hero */
+  .hero{display:grid; grid-template-columns:1.3fr .7fr; gap:clamp(24px,4vw,48px); align-items:center; margin-bottom:56px}
+  @media (max-width:680px){.hero{grid-template-columns:1fr}}
+
+  /* 縦型ショートのミニプレビュー */
+  .phone{
+    aspect-ratio:9/16; border-radius:24px; overflow:hidden; position:relative;
+    background:linear-gradient(170deg,#1b2233,#262a3a 55%,#3a2a17);
+    box-shadow:var(--shadow); border:1px solid var(--line);
+    max-width:240px; width:100%; margin:0 auto;
+  }
+  .phone::before{content:"";position:absolute;inset:0;background:
+    radial-gradient(3px 3px at 20% 14%,#fff8 50%,transparent 51%),
+    radial-gradient(2px 2px at 70% 9%,#fff7 50%,transparent 51%),
+    radial-gradient(3px 3px at 84% 30%,#fff6 50%,transparent 51%),
+    radial-gradient(2px 2px at 12% 42%,#fff6 50%,transparent 51%),
+    radial-gradient(2px 2px at 58% 22%,#fff8 50%,transparent 51%),
+    radial-gradient(55% 35% at 50% 52%,rgba(255,150,40,.35),transparent 70%)}
+  .pack{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-56%) rotate(-4deg);
+    width:58%; aspect-ratio:3/4; border-radius:10px;
+    background:linear-gradient(160deg,#ffd27a,#ff9d3c 60%,#f07a2a);
+    box-shadow:0 0 40px rgba(255,140,40,.55), inset 0 0 0 5px rgba(255,255,255,.35);
+    animation:talk 1.1s ease-in-out infinite;
+  }
+  @keyframes talk{0%,100%{transform:translate(-50%,-56%) rotate(-4deg)}50%{transform:translate(-50%,-58%) rotate(3deg)}}
+  @media (prefers-reduced-motion:reduce){.pack{animation:none}}
+  .pack .eye{position:absolute; top:28%; width:20%; aspect-ratio:1; background:#fff; border-radius:50%; box-shadow:inset 0 -3px 0 rgba(0,0,0,.08)}
+  .pack .eye::after{content:"";position:absolute;left:35%;top:35%;width:40%;height:40%;background:#2a1d10;border-radius:50%}
+  .pack .eye.l{left:22%} .pack .eye.r{right:22%}
+  .pack .brow{position:absolute; top:20%; width:24%; height:5px; background:#5a2c0c; border-radius:3px}
+  .pack .brow.l{left:19%; transform:rotate(18deg)} .pack .brow.r{right:19%; transform:rotate(-18deg)}
+  .pack .mouth{position:absolute; left:50%; top:55%; width:30%; height:18%; transform:translateX(-50%);
+    background:#6b1f12; border-radius:40% 40% 50% 50%; animation:mouth .28s ease-in-out infinite alternate}
+  @keyframes mouth{from{height:8%}to{height:18%}}
+  @media (prefers-reduced-motion:reduce){.pack .mouth{animation:none}}
+  .pack .arm{position:absolute; top:48%; width:22%; height:6px; background:#f7c77e; border-radius:4px}
+  .pack .arm.l{left:-16%; transform:rotate(-35deg)} .pack .arm.r{right:-16%; transform:rotate(35deg)}
+  .phone .cap{position:absolute;left:0;right:0;bottom:16%;text-align:center}
+  .phone .cap span{font-size:15px;font-weight:900;color:#fff;letter-spacing:.02em;
+    text-shadow:0 2px 0 #000,0 0 6px #000;background:rgba(0,0,0,.25);padding:4px 10px;border-radius:6px}
+  .phone .pill{position:absolute;left:0;right:0;top:14px;text-align:center}
+  .phone .pill span{font-size:10.5px;letter-spacing:.1em;color:#f5c542;
+    border:1px solid rgba(245,197,66,.4);padding:4px 12px;border-radius:999px;font-weight:700;background:rgba(0,0,0,.2)}
+
+  /* step strip */
+  .steps{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+  .steps .s{display:flex;align-items:center;gap:10px;background:var(--panel);
+    border:1px solid var(--line);border-radius:999px;padding:9px 16px 9px 10px;font-weight:700;font-size:14px}
+  .steps .n{width:24px;height:24px;border-radius:50%;background:var(--gold);color:#1a1206;
+    display:grid;place-items:center;font-size:13px;font-weight:900}
+
+  section{margin:52px 0}
+  h2{font-size:clamp(22px,3.4vw,30px);letter-spacing:-.01em;margin:0 0 6px;font-weight:900}
+  .sub{color:var(--muted);margin:0 0 24px;font-size:15px}
+
+  /* pipeline */
+  .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media (max-width:680px){.flow{grid-template-columns:1fr 1fr}}
+  .node{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px;box-shadow:var(--shadow)}
+  .node .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:800}
+  .node h3{margin:8px 0 6px;font-size:17px;font-weight:800}
+  .node p{margin:0;font-size:13.5px;color:var(--muted);line-height:1.6}
+
+  .callout{background:var(--panel-2);border:1px solid var(--line);border-left:3px solid var(--gold);
+    border-radius:12px;padding:18px 20px;margin:22px 0 0;font-size:15px}
+  .callout b{color:var(--ink)}
+  .callout.warn{border-left-color:var(--rose)}
+
+  .kit{background:var(--panel);border:1px solid var(--line);border-radius:20px;
+    padding:clamp(22px,4vw,34px);box-shadow:var(--shadow)}
+  .btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--sans);
+    font-weight:800;font-size:14px;padding:11px 18px;border-radius:12px;cursor:pointer;
+    border:1px solid var(--line);background:var(--panel-2);color:var(--ink);text-decoration:none;
+    transition:transform .08s ease,filter .15s ease}
+  .btn:hover{filter:brightness(1.04)} .btn:active{transform:translateY(1px)}
+  .btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .btn.primary{background:var(--gold);color:#1a1206;border-color:transparent}
+  .kit .row{background:var(--panel-2);box-shadow:none}
+  .msgbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;overflow-x:auto;margin-top:12px}
+  .msgbox pre{margin:0;font-family:var(--sans);font-size:13.5px;line-height:1.75;white-space:pre-wrap;word-break:break-word}
+  .copyline{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+  .hint{color:var(--muted);font-size:13px;margin:14px 0 0}
+
+  /* rows */
+  .use{display:grid;gap:12px}
+  .row{display:grid;grid-template-columns:34px 1fr;gap:14px;align-items:start;
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow)}
+  .row .n{width:30px;height:30px;border-radius:9px;background:var(--gold);color:#1a1206;
+    display:grid;place-items:center;font-weight:900;font-size:15px}
+  .row .t{min-width:0}
+  .row .t b{font-size:15.5px}
+  .row .t p{margin:4px 0 0;color:var(--muted);font-size:13.5px}
+  .row .t ol{margin:8px 0 0;padding-left:1.3em;color:var(--muted);font-size:13.5px}
+  .row .t ol li{margin:2px 0}
+  .row .t ol b{font-size:inherit;color:var(--ink)}
+  .tool{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.06em;color:#1a1206;
+    background:color-mix(in srgb,var(--gold) 22%,transparent);border-radius:6px;padding:2px 8px;margin-left:6px;vertical-align:2px}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;
+    background:color-mix(in srgb,var(--ink) 8%,transparent);padding:1px 6px;border-radius:6px;color:var(--ink)}
+
+  /* rules */
+  .rules{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:680px){.rules{grid-template-columns:1fr}}
+  .rule{display:flex;gap:12px;align-items:flex-start;background:var(--panel);
+    border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .rule .dot{font-weight:900;margin-top:1px;color:var(--gold)}
+  .rule .dot.no{color:var(--rose)}
+  .rule span{font-size:14px}
+
+  /* table */
+  .tbl{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;overflow:hidden;font-size:14px}
+  .tbl th,.tbl td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  .tbl th{background:var(--panel-2);font-size:13px;font-weight:800}
+  .tbl tr:last-child td{border-bottom:none}
+  .scroll-x{overflow-x:auto}
+
+  .det{margin-top:16px}
+  .det summary{cursor:pointer;font-weight:800;font-size:14px;color:var(--gold);list-style:none;
+    display:inline-flex;align-items:center;gap:8px;padding:8px 0}
+  .det summary::-webkit-details-marker{display:none}
+  .det summary::before{content:"▸";font-size:12px}
+  .det[open] summary::before{content:"▾"}
+  .det summary:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:4px}
+  .det .d-body{font-size:14px;color:var(--muted);padding:0 0 6px}
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:13px}
+  footer a{color:var(--gold);font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<div class="page">
+
+  <div class="hero">
+    <div>
+      <p class="eyebrow">AIショート動画 ・ <span class="tag-mono" style="text-transform:none;letter-spacing:0">object talk</span></p>
+      <h1>モノが喋る動画を、<br>15分で1本。</h1>
+      <p class="lead">カイロやレモンが、ピクサー映画みたいな顔で豆知識を喋るショート動画。<b>撮影も顔出しもいりません</b>。AIを4つ順番に使うだけで、手を動かすのは5分ほど。残りは生成を待つ時間です。</p>
+      <div class="steps">
+        <div class="s"><span class="n">1</span>台本を作る</div>
+        <div class="s"><span class="n">2</span>画像を作る</div>
+        <div class="s"><span class="n">3</span>声を作る</div>
+        <div class="s"><span class="n">4</span>喋らせる</div>
+      </div>
+    </div>
+    <div class="phone" aria-hidden="true">
+      <div class="pill"><span>▍ 9:16 ショート</span></div>
+      <div class="pack">
+        <div class="brow l"></div><div class="brow r"></div>
+        <div class="eye l"></div><div class="eye r"></div>
+        <div class="mouth"></div>
+        <div class="arm l"></div><div class="arm r"></div>
+      </div>
+      <div class="cap"><span>振るだけで</span></div>
+    </div>
+  </div>
+
+  <section>
+    <h2>AIを4つ、<span style="color:var(--gold)">バトンのように</span>つなぐ。</h2>
+    <p class="sub">1つのAIで全部やるのではなく、得意なAIに1工程ずつ任せます。前の工程で作ったものを、次のAIに渡していくだけです。</p>
+    <div class="flow">
+      <div class="node">
+        <div class="k">① 台本</div><h3>ChatGPT</h3>
+        <p>カスタムGPT「Object Talk」にモノの名前を入れると、画像の指示文と10秒台本が出る。</p>
+      </div>
+      <div class="node">
+        <div class="k">② 画像</div><h3>Nano Banana Pro</h3>
+        <p>①の指示文を貼るだけで、顔と手のついたキャラ画像ができる。縦長9:16で。</p>
+      </div>
+      <div class="node">
+        <div class="k">③ 声</div><h3>DeeVid AI</h3>
+        <p>①の台本を読み上げさせる。アニメ声優のような声を選び、1.3倍速に。</p>
+      </div>
+      <div class="node">
+        <div class="k">④ 動画</div><h3>Kling AIアバター</h3>
+        <p>②の画像と③の声を入れると、口の動きが声に合った動画になる。</p>
+      </div>
+    </div>
+    <div class="callout"><b>必要なのは各AIの無料アカウントだけ</b> — どのAIも無料枠で試せます（使いすぎるとクレジットが足りなくなることはあります）。すべてブラウザで使えるので、インストールは要りません。</div>
+  </section>
+
+  <section class="kit">
+    <h2>作り方</h2>
+    <p class="sub">プロンプトはボタンでコピーできます。「カイロ」の部分を、作りたいモノに変えて使ってください。</p>
+    <div class="use">
+
+      <div class="row"><div class="n">1</div><div class="t"><b>台本と画像の指示文を作る</b><span class="tool">ChatGPT</span>
+        <ol>
+          <li>ChatGPTの左メニューから <b>「GPT」</b>（GPTの詳細を見る）を開く</li>
+          <li>「GPTを検索する」に英語で <b>Object Talk</b> と入れる</li>
+          <li>作成者が <b>aicenturies.com</b> のものを選んで「チャットを開始する」</li>
+          <li>作りたいモノの名前だけを送る（例：<code>使い捨てカイロ</code>）</li>
+        </ol>
+        <p>「Text-to-Image Prompt（画像の指示文）」と「10-Second Script（10秒台本）」が出てきます。関連するモノの案もいくつか出るので、ネタ切れしません。</p>
+        <div class="msgbox"><pre id="p1">使い捨てカイロ
+台本は日本語で、10秒で読める長さにしてください。</pre></div>
+        <div class="copyline"><button class="btn" type="button" data-copy="p1">📋 コピー</button><span class="hint" style="margin:0">台本が英語で出てきたときは、2行目を足して送ります。</span></div>
+      </div></div>
+
+      <div class="row"><div class="n">2</div><div class="t"><b>キャラクターの画像を作る</b><span class="tool">Gemini / Genspark</span>
+        <ol>
+          <li>①の画像の指示文（英語のかたまり）を <b>1文字も変えずに</b> コピー</li>
+          <li>Geminiならそのまま貼って送る。Gensparkなら「AI画像」→ モデル <b>Nano Banana Pro</b> → 比率 <b>9:16</b> を選んでから貼る</li>
+          <li>できた画像をダウンロード</li>
+        </ol>
+        <div class="msgbox"><pre id="p2">次のプロンプトで画像を生成してください。縦長（アスペクト比 9:16）で。
+
+（ここに①の画像の指示文を貼る）</pre></div>
+        <div class="copyline"><button class="btn" type="button" data-copy="p2">📋 コピー（Gemini用）</button></div>
+        <p style="margin-top:12px">Geminiで作ると、右下に薄いGeminiのマーク（透かし）が入ります。気になる人はGensparkで作ると入りません。</p>
+      </div></div>
+
+      <div class="row"><div class="n">3</div><div class="t"><b>台本を読み上げる声を作る</b><span class="tool">DeeVid AI</span>
+        <ol>
+          <li>DeeVid AIに無料登録して、<b>「テキスト読み上げ」</b> を開く</li>
+          <li>①の10秒台本をそのまま貼る</li>
+          <li>「音声」の言語を <b>日本語</b> にして（最初は英語になっています）、好きな声を選ぶ</li>
+          <li>速度を <b>1.0 → 1.3</b> にして「作成」→ ダウンロード</li>
+        </ol>
+        <p>ゆっくり喋るとスワイプされるので、少し早口にするのがコツです。30秒ほどでできます。</p>
+      </div></div>
+
+      <div class="row"><div class="n">4</div><div class="t"><b>画像と声を合わせて喋らせる</b><span class="tool">Kling</span>
+        <ol>
+          <li>Klingで <b>「AIアバター 2.0」</b>（Avatar 2.0）を開く</li>
+          <li>「画像をアップロード」に②の画像、「音声をアップロード」に③の声を入れる</li>
+          <li>下のプロンプトを貼って「生成」</li>
+        </ol>
+        <div class="msgbox"><pre id="p4">キャラクターは表情豊かに、手を使ったボディランゲージも含めて動かして。
+背景は自然に動かして。
+テロップは不要。</pre></div>
+        <div class="copyline"><button class="btn primary" type="button" data-copy="p4">📋 コピー</button></div>
+        <p style="margin-top:12px">生成には5〜10分かかります。待っている間に次のネタの①〜③を進めておくと早いです。</p>
+      </div></div>
+
+    </div>
+    <div class="callout warn"><b>④のプロンプトは空欄にしない</b> — 何も入れないと、口しか動かない・知らない文字のテロップが勝手に出る、という動画になりがちです。上の3行を入れるだけで、身振りつきで喋るようになります。</div>
+  </section>
+
+  <section id="route-b">
+    <h2>Gemini Proなら、<span style="color:var(--gold)">声と動画を1回で</span>。</h2>
+    <p class="sub">Googleの有料プラン（Gemini Pro）を使っている人は、③と④をまとめてGeminiに頼めます。声を作ってアップロードする手間が省けます。</p>
+    <div class="use">
+      <div class="row"><div class="n">A</div><div class="t"><b>②の画像を作ったチャットで、続けて頼む</b>
+        <p>画像ができたら、同じチャットにそのまま下の文を送ります。「セリフ」の部分に①の台本を入れてください。</p>
+        <div class="msgbox"><pre id="pb">この画像をそのまま使って、縦長（9:16）の動画にしてください。カイロのキャラクターがカメラに向かって、日本語で次のセリフを話します。
+セリフ：「（ここに①の台本）」
+・声：アニメ声優のような、元気で少し怒っている男性の声。テンポは少し速め
+・キャラクターは表情豊かに、小さな手を使ったボディランゲージも含めて動かして。口の動きをセリフに合わせて
+・背景は自然に動かして
+・テロップ・字幕・BGMは不要</pre></div>
+        <div class="copyline"><button class="btn" type="button" data-copy="pb">📋 コピー</button></div>
+      </div></div>
+    </div>
+    <div class="callout" id="route-b-note"><b>違い</b> — 声の種類や速さを細かく選べるのは④のKlingルート。手軽さはGeminiルート。Geminiの動画は1本8秒ほどなので、台本は短めにします。</div>
+  </section>
+
+  <section>
+    <h2>作れるのと、<span style="color:var(--gold)">伸びる</span>のは別。</h2>
+    <p class="sub">ここまでで「喋る動画」は作れます。ただ、SNSで流れてくるバズ動画は、作者が1本に4時間かけていることもあります。差が出るのはこの4つです。</p>
+    <div class="scroll-x">
+      <table class="tbl">
+        <tr><th style="width:26%">差が出るところ</th><th>こうする</th></tr>
+        <tr><td><b>ネタ</b></td><td>「へえ」と言いたくなる豆知識か。<b>身近なモノの“間違った使い方”</b>を本人（モノ）に怒らせる形は強い。例：カイロ「揉まないで、振るだけでいい」</td></tr>
+        <tr><td><b>最初の1秒</b></td><td>台本の1文目を、ツッコミや命令から始める。「おいおい」「密閉しないで！」</td></tr>
+        <tr><td><b>画像の表情</b></td><td>気に入る顔が出るまで②を何回か作り直す。台本の感情（怒り・困り・得意げ）と表情を合わせる</td></tr>
+        <tr><td><b>字幕</b></td><td>AIにはテロップを入れさせず、できた動画にCapCut等で自分で入れる。音なしで見る人にも伝わる</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>気をつけること</h2>
+    <p class="sub">投稿する前に、ここだけ確認してください。</p>
+    <div class="rules">
+      <div class="rule"><span class="dot">✓</span><span>台本の豆知識が正しいか、自分で一度調べる（AIの台本は間違えることがある）</span></div>
+      <div class="rule"><span class="dot">✓</span><span>投稿するときは、SNSの「AI生成」ラベルをつける</span></div>
+      <div class="rule"><span class="dot">✓</span><span>使ったAIの利用規約で、商用利用がOKか確認する</span></div>
+      <div class="rule"><span class="dot">✓</span><span>画像の中に変な文字や崩れた指がないか見る</span></div>
+      <div class="rule"><span class="dot no">✕</span><span>実在する商品のロゴやパッケージをそっくり描かせる</span></div>
+      <div class="rule"><span class="dot no">✕</span><span>他の人のバズ動画の台本や声を、そのまま真似する</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>困ったときは</h2>
+    <p class="sub">だいたいこのどれかです。</p>
+    <div class="scroll-x">
+      <table class="tbl">
+        <tr><th style="width:38%">症状</th><th>対処</th></tr>
+        <tr><td>口しか動かない・棒立ち</td><td>④のプロンプトに「表情豊かに、手を使ったボディランゲージも含めて動かして」を入れる</td></tr>
+        <tr><td>知らない文字のテロップが出た</td><td>④のプロンプトに「テロップは不要」を入れて作り直す</td></tr>
+        <tr><td>Object Talkの台本が英語</td><td>「台本は日本語で」と足して送り直す</td></tr>
+        <tr><td>声が英語っぽい・なまっている</td><td>DeeVid AIの「音声」の言語が日本語になっているか確認</td></tr>
+        <tr><td>画像が横長になった</td><td>Gensparkは比率を9:16に。Geminiは「縦長（9:16）で」と書き足す</td></tr>
+        <tr><td>右下にマークが入っている</td><td>Geminiの透かしです。Gensparkで作り直すと入りません</td></tr>
+        <tr><td>④がなかなか終わらない</td><td>5〜10分かかるのが普通です。画面を閉じても、あとで作品一覧から見られます</td></tr>
+        <tr><td>クレジットが足りない</td><td>各AIとも無料枠は日ごと・月ごとに回復します。本数を作るなら有料プランを検討</td></tr>
+      </table>
+    </div>
+
+    <details class="det">
+      <summary>よくある質問</summary>
+      <div class="d-body">
+        <p><b>全部このAIじゃないとダメ？</b><br>いいえ。画像・声・動画のAIは他のものに替えても作れます。大事なのは「台本 → 画像 → 声 → 喋らせる」の順番です。</p>
+        <p><b>1本の長さは？</b><br>10秒前後が作りやすいです。長くしたいときは、同じキャラの画像で台本を2〜3本に分けて作り、あとでつなげます。</p>
+        <p><b>毎回同じキャラで続けたい</b><br>最初に作った画像を保存しておき、④で毎回それを使います。①で出た指示文も保存しておくと、似た画像を作り直せます。</p>
+        <p><b>スマホだけで作れる？</b><br>どのAIもスマホのブラウザで開けますが、ファイルのダウンロードとアップロードが多いので、パソコンの方が楽です。</p>
+      </div>
+    </details>
+  </section>
+
+  <footer>
+    <div>参考：<a href="https://www.youtube.com/watch?v=WA-UE6XPsAA" target="_blank" rel="noopener">あなたのAI顧問「大バズり中のAIショート動画を10分で作る方法」</a><br>各AIの画面や料金は変わることがあります（2026年9月時点）。</div>
+    <div>制作：関 諒也</div>
+  </footer>
+
+</div>
+</div>
+
+<script>
+(function(){
+  document.querySelectorAll('[data-copy]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var el = document.getElementById(btn.getAttribute('data-copy'));
+      var text = el.textContent || el.innerText;
+      var ok = function(){ var o = btn.innerHTML; btn.textContent = '✓ コピーしました'; setTimeout(function(){ btn.innerHTML = o; }, 1700); };
+      var fb = function(){ var ta = document.createElement('textarea'); ta.value = text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.focus(); ta.select(); try{ document.execCommand('copy'); }catch(e){} document.body.removeChild(ta); ok(); };
+      if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(ok, fb); } else { fb(); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
