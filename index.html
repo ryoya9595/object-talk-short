@@ -167,6 +167,16 @@
 </style>
 </head>
 <body>
+<!-- url-banner:start -->
+<div id="url-banner" style="background:#e2382c;color:#fff;padding:16px 16px 14px;text-align:center;font-family:'Zen Kaku Gothic New','Hiragino Sans','Noto Sans JP',sans-serif;line-height:1.6;box-sizing:border-box">
+  <div style="font-size:1.08rem;font-weight:900;letter-spacing:.01em">📌 このマニュアルは読まなくてOKです！</div>
+  <div style="font-size:.98rem;font-weight:700;margin-top:2px">Claude Code に、このページのURLをコピペして送るだけ。台本と画像の指示文はAIが作り、画像・声・動画の作り方も1つずつ案内します</div>
+  <div style="margin-top:10px;display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center">
+    <code style="background:rgba(255,255,255,.18);padding:5px 12px;border-radius:8px;font-size:.92rem;word-break:break-all;font-family:ui-monospace,Menlo,monospace">https://ryoya9595.github.io/object-talk-short/</code>
+    <button type="button" onclick="(function(b){navigator.clipboard.writeText('https://ryoya9595.github.io/object-talk-short/').then(function(){b.textContent='コピーしました ✓';setTimeout(function(){b.textContent='URLをコピー'},1600)})})(this)" style="background:#fff;color:#e2382c;border:0;border-radius:999px;padding:7px 16px;font-weight:900;cursor:pointer;font-family:inherit;font-size:.92rem">URLをコピー</button>
+  </div>
+</div>
+<!-- url-banner:end -->
 
 <div class="wrap">
 <div class="page">
@@ -352,6 +362,23 @@
 
   <footer>
     <div>参考：<a href="https://www.youtube.com/watch?v=WA-UE6XPsAA" target="_blank" rel="noopener">あなたのAI顧問「大バズり中のAIショート動画を10分で作る方法」</a><br>各AIの画面や料金は変わることがあります（2026年9月時点）。</div>
+
+<!-- ai-guide:start -->
+<section id="ai-guide" style="max-width:860px;margin:32px auto 0;padding:18px 20px;border:2px dashed #e2382c;border-radius:14px;font-size:.9rem;line-height:1.8;color:#444;background:#fff8f6">
+  <p style="font-weight:900;color:#e2382c;margin:0 0 6px">🤖 Claude Code へ（このページのURLを渡されたときの進め方）</p>
+  <p style="margin:0 0 6px">このページのURLを渡されたら、「モノが喋るショート動画」を作りたい人の<b>案内役</b>を頼まれています。上の①〜④の手順を読んだうえで、次の順で進めてください。画像・声・動画はブラウザのサービス（Gemini／Genspark・DeeVid AI・Kling）で作るため、あなたが代わりに操作することはできません。<b>1工程ずつ、次に何をするかを短く案内し、相手の報告を待ってから次へ進んでください。</b></p>
+  <ol style="margin:0 0 6px 1.3em;padding:0">
+    <li><b>ネタを決める</b>：作りたい「モノ」の名前を聞く。決まっていなければ、身近なモノの“間違った使い方”を本人（モノ）が怒る形で3案出す（例：カイロ「揉まないで、振るだけでいい」）。</li>
+    <li><b>①台本と画像の指示文を、あなたが作る</b>（ChatGPTのカスタムGPTは使わなくてよい）。台本＝日本語・10秒で読める長さ・1文目はツッコミか命令から始める。画像の指示文＝英語・ピクサー風の顔と手が付いたそのモノのキャラクター・縦長9:16・テキストなし。両方をコピーしやすい形で出す。</li>
+    <li><b>②画像</b>：GeminiかGensparkに画像の指示文を貼る手順を案内（Gensparkは「AI画像」→ Nano Banana Pro → 9:16）。できたらダウンロードしてもらう。</li>
+    <li><b>③声</b>：DeeVid AIの「テキスト読み上げ」に台本を貼り、言語を日本語・速度1.3にしてダウンロードする手順を案内。</li>
+    <li><b>④動画</b>：Klingの「AIアバター 2.0」に画像と声を入れ、上の④のプロンプト（表情豊かに／背景は自然に／テロップ不要）を貼って生成する手順を案内。5〜10分かかると伝える。</li>
+    <li><b>仕上げ</b>：字幕はCapCut等で自分で入れること、投稿前の確認（豆知識の裏取り・AI生成ラベル・商用利用の規約）を伝える。</li>
+  </ol>
+  <p style="margin:0">困ったときは、このページの「困ったときは」の表を見て答えてください。Gemini Proを使っている人には、③④をまとめてGeminiに頼むルートも案内できます。</p>
+</section>
+<!-- ai-guide:end -->
+
     <div>制作：関 諒也</div>
   </footer>
 
